@@ -417,4 +417,3 @@ __device__ void dprint_samplexy ( const char* msgheader, int k, float x[], float
   printf("%s %d check x[0-3] %f, %f, %f, %f\n",  msgheader,k, x[0], x[1], x[2], x[3]);
   printf("%s %d check y[0-3] %f, %f, %f, %f\n",  msgheader,k, y[0], y[1], y[2], y[3]);
 }
-
