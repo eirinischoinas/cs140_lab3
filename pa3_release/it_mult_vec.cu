@@ -32,6 +32,9 @@ void mult_vec_async(int n, int rows_per_thread, int num_async_iter, float *y, fl
 
   for (int i = 0; i < rows_per_thread; i++) {
     int row_index = idx * rows_per_thread + i;
+    if (row_index >= n) {
+      continue;
+    }
     y[row_index] = x[row_index]; //Start with current value of x
   }
   for (int k = 0; k < num_async_iter; k++) {
@@ -61,6 +64,7 @@ void mult_vec_async(int n, int rows_per_thread, int num_async_iter, float *y, fl
  
   for (int i = 0; i < rows_per_thread; i++) {
     int row_index = idx * rows_per_thread + i;
+    if (row_index >= n) continue;
     diff[row_index] = fabs(x[row_index] - y[row_index]); //Compute the difference
   }
   
@@ -85,19 +89,22 @@ void mult_vec(int n, int rows_per_thread, float *y, float *d, float *A,
   /*Your solution to compute idx */ 
   idx = blockIdx.x * blockDim.x + threadIdx.x;
   
-  
-
-  for (int i = 0; i < rows_per_thread; i++) {
+  for (int i = 0; i < rows_per_thread; i++) 
+  {
     int row_index = idx * rows_per_thread + i;
+    if (row_index >= n) continue;
     double sum = d[row_index];
-    for (int j = 0; j < n; j++) {
-      sum += A[row_index*n + j]*x[j];
-    }
-    y[row_index] = sum;
 
-    diff[row_index] = fabs(sum - x[row_index]);
+    int start = UPPER_TRIANGULAR ? row_index : 0;
+    for (int j = start; j < n; j++) 
+    {
+      sum += A[row_index*n + j] * x[j];
+    }
+    y[row_index] = (float)sum;
+    diff[row_index] = fabsf((float)sum - x[row_index]);
+    }
   }
-}
+
 
 /*-------------------------------------------------------------------
  * Function:  it_mult_vec
