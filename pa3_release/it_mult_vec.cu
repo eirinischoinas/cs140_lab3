@@ -28,7 +28,7 @@ void mult_vec_async(int n, int rows_per_thread, int num_async_iter, float *y, fl
 #endif
   int idx=0; /*Assign a linearized thread ID, so I can be responsible for some rows*/
   /*Your solution to compute idx */
-  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  idx = blockIdx.x * blockDim.x + threadIdx.x;
 
   for (int i = 0; i < rows_per_thread; i++) 
   {
@@ -86,7 +86,7 @@ void mult_vec(int n, int rows_per_thread, float *y, float *d, float *A,
               float *x, float *diff) {
   int idx=0; /*Assign a linearized thread ID, which will be used to determine what I own*/ 
   /*Your solution to compute idx */ 
-  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  idx = blockIdx.x * blockDim.x + threadIdx.x;
   
 
   for (int i = 0; i < rows_per_thread; i++) {
