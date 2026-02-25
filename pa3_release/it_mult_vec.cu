@@ -30,31 +30,31 @@ void mult_vec_async(int n, int rows_per_thread, int num_async_iter, float *y, fl
   /*Your solution to compute idx */
   idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  for (int i = 0; i < rows_per_thread; i++) {
+  for (int i = 0; i < rows_per_thread; i++) 
+  {
     int row_index = idx * rows_per_thread + i;
-    if (row_index >= n) {
-      continue;
-    }
+     if (row_index >= n) return;
     y[row_index] = x[row_index]; //Start with current value of x
   }
+  
   for (int k = 0; k < num_async_iter; k++) {
     /*Perform asynchronous Gauss-Seidel method for y=d+Ay*/
     /*Your solution*/
-    for (int i = 0; i < rows_per_thread; i++) 
-    {
-      int row_index = idx * rows_per_thread + i;
-      if (row_index >= n) 
-      {
-      continue;
-      }
+
+    for (int i = 0; i < rows_per_thread; i++) {
+      int row_index = rows_per_thread * idx + i;
+      if (row_index >= n) continue;
+      
       double sum = d[row_index];
 
-      int start = UPPER_TRIANGULAR ? row_index : 0;
-      for (int j = start; j < n; j++) {
-        sum += A[row_index * n + j] * y[j]; 
+      for (int j = 0; j < n; j++) 
+      {
+        sum += A[row_index * n + j] * y[j];  
       }
       y[row_index] = (float)sum;
-  }
+    }
+
+    
 
 
 #ifdef DEBUG1
@@ -64,7 +64,6 @@ void mult_vec_async(int n, int rows_per_thread, int num_async_iter, float *y, fl
  
   for (int i = 0; i < rows_per_thread; i++) {
     int row_index = idx * rows_per_thread + i;
-    if (row_index >= n) continue;
     diff[row_index] = fabs(x[row_index] - y[row_index]); //Compute the difference
   }
   
@@ -89,22 +88,19 @@ void mult_vec(int n, int rows_per_thread, float *y, float *d, float *A,
   /*Your solution to compute idx */ 
   idx = blockIdx.x * blockDim.x + threadIdx.x;
   
-  for (int i = 0; i < rows_per_thread; i++) 
-  {
+
+  for (int i = 0; i < rows_per_thread; i++) {
     int row_index = idx * rows_per_thread + i;
-    if (row_index >= n) continue;
+    if (row_index >= n) return;
     double sum = d[row_index];
+    for (int j = 0; j < n; j++) {
+      sum += A[row_index*n + j]*x[j];
+    }
+    y[row_index] = sum;
 
-    int start = UPPER_TRIANGULAR ? row_index : 0;
-    for (int j = start; j < n; j++) 
-    {
-      sum += A[row_index*n + j] * x[j];
-    }
-    y[row_index] = (float)sum;
-    diff[row_index] = fabsf((float)sum - x[row_index]);
-    }
+    diff[row_index] = fabs(sum - x[row_index]);
   }
-
+}
 
 /*-------------------------------------------------------------------
  * Function:  it_mult_vec
@@ -153,18 +149,19 @@ int it_mult_vec(int N,
 
   /*Allocate device global space for matrix A. Copy  data to the device global memory*/
   /*Your solution*/
+
   result = cudaMalloc((void**)&A_d, A_size);
   if (result) 
   {
-    printf("Error in cudaMalloc. Error code is %d.\n", result);
+    printf("error in cudaMalloc for A. Error code is %d.\n", result);
     return -1;
   }
   result = cudaMemcpy(A_d, A, A_size, cudaMemcpyHostToDevice);
   if (result) 
   {
-    printf("Error in cudaMemcpy. Error code is %d.\n", result);
+    printf("error in cudaMemcpy for A. Error code is %d.\n", result);
     return -1;
-  } 
+  }
   
   /*Allocate, and copy other  data to the device global memory*/
   result = cudaMalloc( (void **) &x_d, row_size);
@@ -214,7 +211,8 @@ int it_mult_vec(int N,
     } else 
     { /* call a kernel Jacobi method to compute y=d+Ax*/
       /*Your solution*/
-     mult_vec<<<num_blocks, threads_per_block>>>(N, rows_per_thread, y_d, d_d, A_d, x_d, diff_d);  
+        mult_vec<<<num_blocks, threads_per_block>>>(N, rows_per_thread, y_d, d_d, A_d, x_d, diff_d);
+
      k++;
     }
     // Detect convergence. Copy the difference vector from the device
@@ -238,10 +236,11 @@ int it_mult_vec(int N,
     }
   }
   /*Copy the final solution vector y from device. */
+  /*Your solution*/
+
   result = cudaMemcpy(y, y_d, row_size, cudaMemcpyDeviceToHost);
-  if (result) 
-  {
-    printf("Error in cudaMemcpy. Error code is %d.\n", result);
+  if (result) {
+    printf("Error in cudaMemcpy. Eror code is %d.\n", result);
     return -1;
   }
 
