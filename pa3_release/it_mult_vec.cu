@@ -34,7 +34,8 @@ void mult_vec_async(int n, int rows_per_thread, int num_async_iter, float *y, fl
     int row_index = idx * rows_per_thread + i;
     y[row_index] = x[row_index]; //Start with current value of x
   }
-  for (int k = 0; k < num_async_iter; k++) {
+  for (int k = 0; k < num_async_iter; k++) 
+  {
     /*Perform asynchronous Gauss-Seidel method for y=d+Ay*/
     /*Your solution*/
     for (int i = 0; i < rows_per_thread; i++) 
@@ -48,6 +49,7 @@ void mult_vec_async(int n, int rows_per_thread, int num_async_iter, float *y, fl
         }
         y[row_index] = sum;
       }
+    }
 
 #ifdef DEBUG1
     dprint_samplexy ( "GS GPU ", k, x, y, n);
