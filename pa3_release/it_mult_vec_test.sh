@@ -15,4 +15,7 @@ module load slurm
 #module load gpu
 #module load cuda
 module load gpu/0.15.4 gcc/7.2.0 cuda/11.0.2
+echo "HOST: $(hostname)"
+echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
+nvidia-smi
 ./it_mult_vec_test
