@@ -19,3 +19,4 @@ echo "HOST: $(hostname)"
 echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
 nvidia-smi
 ./it_mult_vec_test
+
